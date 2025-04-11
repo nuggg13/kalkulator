@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Modern</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    /* Variabel CSS untuk tema */
+    :root {
+      --bg-color: #f0f2f5;
+      --calculator-bg: #ffffff;
+      --display-bg: #f8f9fa;
+      --display-border: #ccc;
+      --number-bg: #e9ecef;
+      --number-hover: #d1d4d7;
+      --operator-bg: #007bff;
+      --operator-hover: #0056b3;
+      --equals-bg: #28a745;
+      --equals-hover: #218838;
+      --clear-bg: #dc3545;
+      --clear-hover: #c82333;
+      --text-color: #333;
+      --error-color: #dc3545;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #1c2526;
+      --calculator-bg: #2c3e50;
+      --display-bg: #34495e;
+      --display-border: #4a6278;
+      --number-bg: #4a6278;
+      --number-hover: #5d7a93;
+      --operator-bg: #3498db;
+      --operator-hover: #2980b9;
+      --equals-bg: #2ecc71;
+      --equals-hover: #27ae60;
+      --clear-bg: #e74c3c;
+      --clear-hover: #c0392b;
+      --text-color: #ecf0f1;
+      --error-color: #ff6b6b;
+    }
+
+    /* Transisi untuk elemen dengan variabel CSS */
+    body,
+    .calculator,
+    #display,
+    button,
+    .error {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-[var(--bg-color)] min-h-screen flex items-center justify-center">
+  <div class="calculator relative bg-[var(--calculator-bg)] p-5 rounded-lg shadow-lg w-full max-w-md mx-4">
+    <h2 class="text-2xl text-[var(--text-color)] mb-5 text-center">Kalkulator</h2>
+    <input type="text" id="display" readonly value="0"
+      class="w-full p-4 text-2xl text-right border border-[var(--display-border)] rounded-md bg-[var(--display-bg)] text-[var(--text-color)] mb-3 focus:outline-none">
+    <div class="buttons grid grid-cols-4 gap-2">
+      <button class="clear bg-[var(--clear-bg)] text-white p-4 rounded-md hover:bg-[var(--clear-hover)]"
+        onclick="clearDisplay()">C</button>
+      <button class="operator bg-[var(--operator-bg)] text-white p-4 rounded-md hover:bg-[var(--operator-hover)]"
+        onclick="appendOperator('/')">÷</button>
+      <button class="operator bg-[var(--operator-bg)] text-white p-4 rounded-md hover:bg-[var(--operator-hover)]"
+        onclick="appendOperator('*')">×</button>
+      <button class="operator bg-[var(--operator-bg)] text-white p-4 rounded-md hover:bg-[var(--operator-hover)]"
+        onclick="appendOperator('-')">-</button>
+
+      <button
+        class="number bg-[var(--number-bg)] text-[var(--text-color)] p-4 rounded-md hover:bg-[var(--number-hover)]"
+        onclick="appendNumber('7')">7</button>
+      <button
+        class="number bg-[var(--number-bg)] text-[var(--text-color)] p-4 rounded-md hover:bg-[var(--number-hover)]"
+        onclick="appendNumber('8')">8</button>
+      <button
+        class="number bg-[var(--number-bg)] text-[var(--text-color)] p-4 rounded-md hover:bg-[var(--number-hover)]"
+        onclick="appendNumber('9')">9</button>
+      <button class="operator bg-[var(--operator-bg)] text-white p-4 rounded-md hover:bg-[var(--operator-hover)]"
+        onclick="appendOperator('+')">+</button>
+
+      <button
+        class="number bg-[var(--number-bg)] text-[var(--text-color)] p-4 rounded-md hover:bg-[var(--number-hover)]"
+        onclick="appendNumber('4')">4</button>
+      <button
+        class="number bg-[var(--number-bg)] text-[var(--text-color)] p-4 rounded-md hover:bg-[var(--number-hover)]"
+        onclick="appendNumber('5')">5</button>
+      <button
+        class="number bg-[var(--number-bg)] text-[var(--text-color)] p-4 rounded-md hover:bg-[var(--number-hover)]"
+        onclick="appendNumber('6')">6</button>
+      <button class="equals bg-[var(--equals-bg)] text-white p-4 rounded-md hover:bg-[var(--equals-hover)]"
+        onclick="calculate()">=</button>
+
+      <button
+        class="number bg-[var(--number-bg)] text-[var(--text-color)] p-4 rounded-md hover:bg-[var(--number-hover)]"
+        onclick="appendNumber('1')">1</button>
+      <button
+        class="number bg-[var(--number-bg)] text-[var(--text-color)] p-4 rounded-md hover:bg-[var(--number-hover)]"
+        onclick="appendNumber('2')">2</button>
+      <button
+        class="number bg-[var(--number-bg)] text-[var(--text-color)] p-4 rounded-md hover:bg-[var(--number-hover)]"
+        onclick="appendNumber('3')">3</button>
+      <button
+        class="decimal bg-[var(--number-bg)] text-[var(--text-color)] p-4 rounded-md hover:bg-[var(--number-hover)]"
+        onclick="appendDecimal()">.</button>
+
+      <button
+        class="number col-span-2 bg-[var(--number-bg)] text-[var(--text-color)] p-4 rounded-md hover:bg-[var(--number-hover)]"
+        onclick="appendNumber('0')">0</button>
+    </div>
+    <button
+      class="theme-toggle absolute bottom-3 right-3 bg-[var(--operator-bg)] text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-[var(--operator-hover)]"
+      onclick="toggleTheme()" title="Ganti Tema">
+      <span id="theme-icon">☀️</span>
+    </button>
+    <div id="error" class="error text-[var(--error-color)] text-sm mt-3"></div>
+  </div>
+
+  <script>
+    let currentInput = "";
+    let operand1 = null;
+    let operator = null;
+    let waitingForSecondOperand = false;
+
+    const display = document.getElementById("display");
+    const errorDiv = document.getElementById("error");
+    const themeIcon = document.getElementById("theme-icon");
+
+    function appendNumber(number) {
+      if (waitingForSecondOperand) {
+        currentInput = number;
+        waitingForSecondOperand = false;
+      } else {
+        currentInput = currentInput === "0" ? number : currentInput + number;
+      }
+      updateDisplay();
+    }
+
+    function appendDecimal() {
+      if (!currentInput.includes(".")) {
+        currentInput = currentInput === "" ? "0." : currentInput + ".";
+      }
+      updateDisplay();
+    }
+
+    function appendOperator(op) {
+      if (currentInput === "") return;
+
+      if (operand1 === null) {
+        operand1 = parseFloat(currentInput);
+      } else if (!waitingForSecondOperand) {
+        calculate();
+        operand1 = parseFloat(currentInput);
+      }
+
+      operator = op;
+      waitingForSecondOperand = true;
+      errorDiv.innerHTML = "";
+    }
+
+    function calculate() {
+      if (operand1 === null || operator === null || currentInput === "") return;
+
+      const operand2 = parseFloat(currentInput);
+      let result;
+
+      switch (operator) {
+        case "+":
+          result = operand1 + operand2;
+          break;
+        case "-":
+          result = operand1 - operand2;
+          break;
+        case "*":
+          result = operand1 * operand2;
+          break;
+        case "/":
+          if (operand2 === 0) {
+            errorDiv.innerHTML = "Tidak bisa membagi dengan nol!";
+            return;
+          }
+          result = operand1 / operand2;
+          break;
+        default:
+          return;
+      }
+
+      currentInput = Number.isInteger(result) ? result.toString() : result.toFixed(4);
+      operand1 = null;
+      operator = null;
+      waitingForSecondOperand = false;
+      errorDiv.innerHTML = "";
+      updateDisplay();
+    }
+
+    function clearDisplay() {
+      currentInput = "";
+      operand1 = null;
+      operator = null;
+      waitingForSecondOperand = false;
+      errorDiv.innerHTML = "";
+      display.value = "0";
+    }
+
+    function updateDisplay() {
+      display.value = currentInput || "0";
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute("data-theme");
+      const newTheme = currentTheme === "dark" ? "light" : "dark";
+      html.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+      themeIcon.textContent = newTheme === "dark" ? "☀️" : "🌙";
+    }
+
+    window.onload = () => {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) {
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        themeIcon.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+      }
+    };
+  </script>
+</body>
+
+</html>
